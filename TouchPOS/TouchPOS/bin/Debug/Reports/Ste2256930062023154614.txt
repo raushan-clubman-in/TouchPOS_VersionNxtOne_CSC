@@ -1,0 +1,19 @@
+KITCHEN ORDER TICKET
+KOT NO   : KEN/010569
+MEMB NO  :  []
+WAITER   : 132 [Gowda B]
+DATE     :15-Feb-2023  03:52 PM
+TABLE    : BP05
+LOCATION : ENTRY BAR
+---------------------------------
+SLNO ITEM DESC       UOM     QTY
+---------------------------------
+1 PINEAPPLE JUICE   NOS      1        
+2 EVENT SOFTDRINKS  NOS      1        
+
+
+
+
+---------------------------------
+PREPARED BY :5
+i

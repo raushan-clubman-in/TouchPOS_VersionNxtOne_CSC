@@ -1,0 +1,16 @@
+ 0
+ KOT:OEN/003182  KT01
+ TABLE:BP05  ENTRY BAR
+ PAX:2
+ DATE:11/10/2021  TIME:10:21:36 A
+ SERVER: 5
+ ----------------------------------------
+ 1      CAKE 1 KG                      
+ 1      BUNDT TART                     
+ 1      BLUE BERRY MOUSSE CA           
+
+
+
+
+ ----------------------------------------
+i

@@ -1,0 +1,15 @@
+ 0
+ KOT:OEN/003184  BARM
+ TABLE:C03  ENTRY BAR
+ PAX:2
+ DATE:11/10/2021  TIME:10:23:31 A
+ SERVER: 5
+ ----------------------------------------
+ 1      GRAPE JUICE                    
+ 1      POMOGRANATE JUICE              
+
+
+
+
+ ----------------------------------------
+i

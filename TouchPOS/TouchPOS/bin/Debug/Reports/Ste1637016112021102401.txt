@@ -1,0 +1,16 @@
+ 0
+ KOT:OEN/003185  BARM
+ TABLE:BP03  ENTRY BAR
+ PAX:2
+ DATE:11/10/2021  TIME:10:23:58 A
+ SERVER: 5
+ ----------------------------------------
+ 1      CAIPIROSKA                     
+ 1      BLUE LAGOON                    
+ 1      COHIBA SIGLO                   
+
+
+
+
+ ----------------------------------------
+i

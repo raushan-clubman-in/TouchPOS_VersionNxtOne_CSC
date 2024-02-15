@@ -1,0 +1,17 @@
+ 0
+ KOT:OEB/000018  BW01
+ TABLE:BP7  ENTRY BAR
+ PAX:2
+ DATE:06/08/2021  TIME:4:57:32 PM
+ SERVER: 5
+ ---------------------------------
+ 1      CASHEWNUT                 
+ 1      CHIPOTLE GRILL CHK        
+ 1      CHICKEN KHOW-SUEY         
+ 1      BUTTER NAAN               
+
+
+
+
+ ---------------------------------
+i

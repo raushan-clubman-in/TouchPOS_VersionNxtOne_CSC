@@ -1,0 +1,22 @@
+
+KITCHEN ORDER TICKET
+
+KOT NO   : CAT/000002
+MEMB NO  : M04004 [KISHAN LAL BANSAL]
+WAITER   : 55 [STEWARD]
+DATE     :03-Jul-2023  04:27 PM
+TABLE    : D4
+LOCATION : FOOD
+---------------------------------
+SLNO ITEM DESC       UOM     QTY
+---------------------------------
+1 AMERICAN CHOPSUEY VENOS      1        
+2 CHICKEN HONGKONG  NOS      1        
+3 FRUIT CAKE        NOS      1        
+
+
+
+
+---------------------------------
+PREPARED BY :CHS
+i

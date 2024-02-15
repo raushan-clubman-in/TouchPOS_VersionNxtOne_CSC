@@ -1,0 +1,17 @@
+ 0
+ KOT:OEN/003183  BARM
+ TABLE:BP05  ENTRY BAR
+ PAX:2
+ DATE:11/10/2021  TIME:10:22:15 A
+ SERVER: 5
+ ----------------------------------------
+ 1      COKE                           
+ 1      BOTTLE SPRITE                  
+ 1      BOTTLE SODA                    
+ 1      FREE SPRITE                    
+
+
+
+
+ ----------------------------------------
+i

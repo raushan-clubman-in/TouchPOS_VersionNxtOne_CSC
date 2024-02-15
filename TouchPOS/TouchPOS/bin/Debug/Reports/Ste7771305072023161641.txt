@@ -1,0 +1,20 @@
+
+KITCHEN ORDER TICKET
+
+KOT NO   : CAT/000001
+MEMB NO  : M04004 [KISHAN LAL BANSAL]
+WAITER   : 55 [STEWARD]
+DATE     :03-Jul-2023  04:15 PM
+TABLE    : D3
+LOCATION : FOOD
+---------------------------------
+SLNO ITEM DESC       UOM     QTY
+---------------------------------
+1 FRUIT CAKE        NOS      1        
+
+
+
+
+---------------------------------
+PREPARED BY :CHS
+i

@@ -1,0 +1,26 @@
+    ---------------------------------
+              ORDER CANCEL
+    ---------------------------------
+    DATE:11-Oct-2021  9:25:21 PM
+    KOT No: KBR/000137
+    CREW  : 5
+    ---------------------------------
+    BREW WITCH/B04--PAX:2
+    ---------------------------------
+               BREW WITCH
+    ---------------------------------
+    QTY    ITEM NAME
+    ---------------------------------
+    2      MUSHROOM SOUP             
+    1      POMOGRANATE JUICE         
+    1      NAAN                      
+    2      BEEF EATER LARGE          
+    2      BAILEYS IRISH CREAM LARGE 
+    1      BACARDI APPLE SMALL       
+    1      BACARDI SUPERIOR LARGE    
+
+
+
+
+    ---------------------------------
+i

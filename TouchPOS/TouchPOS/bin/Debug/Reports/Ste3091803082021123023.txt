@@ -1,0 +1,16 @@
+ 0
+ KOT:OBR/000002  BW01
+ TABLE:TAB-4  BARBEQUE
+ PAX:5
+ DATE:03/08/2021  TIME:12:01:18 P
+ SERVER: 5
+ ---------------------------------
+ 1      BLUE BERRY MOUSSE CA      
+ 1      BUTTER GARLIC FISH        
+ 1      CAKE 1 KG                 
+
+
+
+
+ ---------------------------------
+i

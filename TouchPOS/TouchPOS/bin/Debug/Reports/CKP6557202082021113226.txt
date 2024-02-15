@@ -1,0 +1,36 @@
+       BLACK RAIN HOSPITALITY PRIVATE LIMITED
+       16th Floor, UB City,Canberra Building
+        Bangalore - 560001, Bangalore-560001
+         GSTIN:-29AAECB3388H1ZE
+         TEL NO:+91 80 49090000
+    ---------------------------------
+            PRO FORMA INVOICE
+    ---------------------------------
+               CHECK PRINT
+    CREW : 5 STEWARD :Abhishek
+    LOC :BARBEQUE/TAB-1 PAX:2
+    ORD NO:1
+    DATE:31-Jul-2021  8:00:17 PM
+    ---------------------------------
+
+      QTY  ITEM                AMOUNT
+    ---------------------------------
+        1  ORANGE JUICE        150.00
+        1  GUAVA JUICE         150.00
+        1  CILANTRO SMOKED CH  425.00
+    ---------------------------------
+                   GROSS AMT:  725.00
+                     OTH CHG:   72.50
+                   CGST 2.5%:   19.95
+                   SGST 2.5%:   19.95
+                     NET AMT:  837.40
+                   Round off:   -0.40
+                   TOTAL AMT:  837.00
+    ---------------------------------
+
+        **Thank You Visit Again**
+
+
+
+
+i

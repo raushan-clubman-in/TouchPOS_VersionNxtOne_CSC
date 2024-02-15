@@ -1,0 +1,8 @@
+F:\ITC\ITC-TouchPOS\oct28ITC-TouchPOS\June4-ITC-TouchPOS\HGATOUCHPOS-LATESTSOLUTION\TPOS_20012015\ClassLibrary2\bin\Debug\ClassLibrary2.dll
+F:\ITC\ITC-TouchPOS\oct28ITC-TouchPOS\June4-ITC-TouchPOS\HGATOUCHPOS-LATESTSOLUTION\TPOS_20012015\ClassLibrary2\bin\Debug\ClassLibrary2.pdb
+F:\ITC\ITC-TouchPOS\oct28ITC-TouchPOS\June4-ITC-TouchPOS\HGATOUCHPOS-LATESTSOLUTION\TPOS_20012015\ClassLibrary2\bin\Debug\ClassLibrary2.xml
+F:\ITC\ITC-TouchPOS\oct28ITC-TouchPOS\June4-ITC-TouchPOS\HGATOUCHPOS-LATESTSOLUTION\TPOS_20012015\ClassLibrary2\obj\Debug\ClassLibrary2.Resources.resources
+F:\ITC\ITC-TouchPOS\oct28ITC-TouchPOS\June4-ITC-TouchPOS\HGATOUCHPOS-LATESTSOLUTION\TPOS_20012015\ClassLibrary2\obj\Debug\Modewinscard1.vbproj.GenerateResource.Cache
+F:\ITC\ITC-TouchPOS\oct28ITC-TouchPOS\June4-ITC-TouchPOS\HGATOUCHPOS-LATESTSOLUTION\TPOS_20012015\ClassLibrary2\obj\Debug\ClassLibrary2.dll
+F:\ITC\ITC-TouchPOS\oct28ITC-TouchPOS\June4-ITC-TouchPOS\HGATOUCHPOS-LATESTSOLUTION\TPOS_20012015\ClassLibrary2\obj\Debug\ClassLibrary2.xml
+F:\ITC\ITC-TouchPOS\oct28ITC-TouchPOS\June4-ITC-TouchPOS\HGATOUCHPOS-LATESTSOLUTION\TPOS_20012015\ClassLibrary2\obj\Debug\ClassLibrary2.pdb
