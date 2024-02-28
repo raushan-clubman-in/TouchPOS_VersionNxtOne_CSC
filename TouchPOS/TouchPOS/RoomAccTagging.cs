@@ -39,7 +39,7 @@ namespace TouchPOS
             //AutoCompleteRoomGuest();
 
             DataTable ChekinData = new DataTable();
-            sql = "select Isnull(First_name,'') + ' '+ isnull(Middlename,'') as GuestName,Isnull(RoomNo,0) as RoomNo,Isnull(ChkNo,0) as CheckinNo from RoomCheckin Where Isnull(ChkNo,0) <> 0 And Isnull(RoomNo,0) <> 0 And Isnull(CheckOut,'') <> 'Y' And '" + GlobalVariable.ServerDate.ToString("dd-MMM-yyyy") + "' Between Arrivaldate And Deptdate ";
+            sql = "select Isnull(First_name,'') + ' '+ isnull(Middlename,'') as GuestName,Isnull(RoomNo,0) as RoomNo,Isnull(ChkNo,0) as CheckinNo from RoomCheckin Where Isnull(ChkNo,0) <> 0 And Isnull(RoomNo,0) <> 0 And Isnull(CheckOut,'') <> 'Y' And '" + GlobalVariable.ServerDate.ToString("dd-MMM-yyyy") + "' Between ARRDATE And Deptdate ";
             ChekinData = GCon.getDataSet(sql);
             if (ChekinData.Rows.Count > 0) 
             {
@@ -90,7 +90,7 @@ namespace TouchPOS
 
         private void AutoCompleteCheckin()
         {
-            sql = "select ChkNo,Isnull(First_name,'') + ' '+ isnull(Middlename,'') +'=>'+cast(ChkNo as varchar(10)) ChkGuest from RoomCheckin Where Isnull(ChkNo,0) <> 0 And Isnull(RoomNo,0) <> '' And Isnull(CheckOut,'') <> 'Y' And '" + GlobalVariable.ServerDate.ToString("dd-MMM-yyyy") + "' Between Arrivaldate And Deptdate ";
+            sql = "select ChkNo,Isnull(First_name,'') + ' '+ isnull(Middlename,'') +'=>'+cast(ChkNo as varchar(10)) ChkGuest from RoomCheckin Where Isnull(ChkNo,0) <> 0 And Isnull(RoomNo,0) <> 0 And Isnull(CheckOut,'') <> 'Y' And '" + GlobalVariable.ServerDate.ToString("dd-MMM-yyyy") + "' Between ARRDATE And Deptdate ";
             dtCheckin = GCon.getDataSet(sql);
             string[] postSource = dtCheckin
                     .AsEnumerable()
@@ -106,7 +106,7 @@ namespace TouchPOS
         private void AutoCompleteRoom()
         {
             //sql = "select ChkNo,Isnull(First_name,'') + ' '+ isnull(Middlename,'') +'=>'+cast(Roomno as varchar(10)) RoomGuest from RoomCheckin Where Isnull(ChkNo,0) <> 0 And Isnull(RoomNo,0) <> '' And Isnull(CheckOut,'') <> 'Y' And '" + GlobalVariable.ServerDate.ToString("dd-MMM-yyyy") + "' Between Arrivaldate And Deptdate ";
-            sql = "select ChkNo,cast(Roomno as varchar(10)) + '=>'+Isnull(First_name,'') + ' '+ isnull(Middlename,'')  RoomGuest from RoomCheckin Where Isnull(ChkNo,0) <> 0 And Isnull(RoomNo,0) <> '' And Isnull(CheckOut,'') <> 'Y' And '" + GlobalVariable.ServerDate.ToString("dd-MMM-yyyy") + "' Between Arrivaldate And Deptdate ";
+            sql = "select ChkNo,cast(Roomno as varchar(10)) + '=>'+Isnull(First_name,'') + ' '+ isnull(Middlename,'')  RoomGuest from RoomCheckin Where Isnull(ChkNo,0) <> 0 And Isnull(RoomNo,0) <> 0 And Isnull(CheckOut,'') <> 'Y' And '" + GlobalVariable.ServerDate.ToString("dd-MMM-yyyy") + "' Between ARRDATE And Deptdate ";
             dtRoom = GCon.getDataSet(sql);
             string[] postSource1 = dtRoom
                     .AsEnumerable()
@@ -121,8 +121,8 @@ namespace TouchPOS
 
         private void AutoCompleteRoomGuest()
         {
-            sql = "select ChkNo,Isnull(First_name,'') + ' '+ isnull(Middlename,'') +'=>'+cast(Roomno as varchar(10)) RoomGuest from RoomCheckin Where Isnull(ChkNo,0) <> 0 And Isnull(RoomNo,0) <> '' And Isnull(CheckOut,'') <> 'Y' And '" + GlobalVariable.ServerDate.ToString("dd-MMM-yyyy") + "' Between Arrivaldate And Deptdate ";
-            sql = "select ChkNo,Isnull(First_name,'') + ' '+ isnull(Middlename,'') + '=>'+ cast(Roomno as varchar(10)) RoomGuest from RoomCheckin Where Isnull(ChkNo,0) <> 0 And Isnull(RoomNo,0) <> '' And Isnull(CheckOut,'') <> 'Y' And '" + GlobalVariable.ServerDate.ToString("dd-MMM-yyyy") + "' Between Arrivaldate And Deptdate And Isnull(First_name,'') + ' '+ isnull(Middlename,'') like '%" + Txt_GuestName.Text + "%' ";
+            sql = "select ChkNo,Isnull(First_name,'') + ' '+ isnull(Middlename,'') +'=>'+cast(Roomno as varchar(10)) RoomGuest from RoomCheckin Where Isnull(ChkNo,0) <> 0 And Isnull(RoomNo,0) <> 0 And Isnull(CheckOut,'') <> 'Y' And '" + GlobalVariable.ServerDate.ToString("dd-MMM-yyyy") + "' Between ARRDATE And Deptdate ";
+            sql = "select ChkNo,Isnull(First_name,'') + ' '+ isnull(Middlename,'') + '=>'+ cast(Roomno as varchar(10)) RoomGuest from RoomCheckin Where Isnull(ChkNo,0) <> 0 And Isnull(RoomNo,0) <> 0 And Isnull(CheckOut,'') <> 'Y' And '" + GlobalVariable.ServerDate.ToString("dd-MMM-yyyy") + "' Between ARRDATE And Deptdate And Isnull(First_name,'') + ' '+ isnull(Middlename,'') like '%" + Txt_GuestName.Text + "%' ";
             dtGuest = GCon.getDataSet(sql);
             string[] postSource2 = dtGuest
                     .AsEnumerable()
@@ -160,7 +160,7 @@ namespace TouchPOS
             SplitCode = Txt_RoomNo.Text.Split(new[] { "=>" }, StringSplitOptions.RemoveEmptyEntries);
             if (e.KeyCode == Keys.Enter || e.KeyCode == Keys.Tab)
             {
-                sql = "Select ChkNo,Roomno,First_name + ' '+ Middlename as GuestName from RoomCheckin Where Roomno = '" + SplitCode[0] + "' And Isnull(ChkNo,0) <> 0 And Isnull(RoomNo,0) <> '' And Isnull(CheckOut,'') <> 'Y'";
+                sql = "Select ChkNo,Roomno,First_name + ' '+ Middlename as GuestName from RoomCheckin Where Roomno = '" + SplitCode[0] + "' And Isnull(ChkNo,0) <> 0 And Isnull(RoomNo,0) <> 0 And Isnull(CheckOut,'') <> 'Y'";
                 GCheck = GCon.getDataSet(sql);
                 if (GCheck.Rows.Count > 0)
                 {

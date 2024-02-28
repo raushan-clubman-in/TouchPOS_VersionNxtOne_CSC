@@ -387,7 +387,7 @@ namespace TouchPOS
             user = Cmb_User.Text.Trim();
             pass = GCon.GetPassword(TxtPass.Text.Trim());
 
-            if (GlobalVariable.gCompName == "CFC" || GlobalVariable.gCompName == "TRNG") { }
+            if (GlobalVariable.gCompName == "CSC" || GlobalVariable.gCompName == "TRNG") { }
             else 
             {
                 sql = "select * from UserActiveSession Where UserId = '" + user + "'";

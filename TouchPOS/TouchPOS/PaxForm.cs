@@ -16,11 +16,11 @@ namespace TouchPOS
         GlobalClass GCon = new GlobalClass();
         public int SPax = 0;
         public bool CancelFlag = false;
-        public readonly ServiceLocation _form1;
+        //public readonly ServiceLocation _form1;
 
-        public PaxForm(ServiceLocation form1)
+        public PaxForm()
         {
-            _form1 = form1;
+            //_form1 = form1;
             InitializeComponent();
         }
 

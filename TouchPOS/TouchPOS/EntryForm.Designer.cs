@@ -29,10 +29,10 @@ namespace TouchPOS
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(EntryForm));
             this.panel1 = new System.Windows.Forms.Panel();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
@@ -118,6 +118,7 @@ namespace TouchPOS
             this.Cmd_D1_DBilling = new System.Windows.Forms.Button();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.listBox_Items = new System.Windows.Forms.ListBox();
+            this.Chk_Contain = new System.Windows.Forms.CheckBox();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.panel2.SuspendLayout();
@@ -193,8 +194,8 @@ namespace TouchPOS
             // 
             // Qty
             // 
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.TopCenter;
-            this.Qty.DefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.TopCenter;
+            this.Qty.DefaultCellStyle = dataGridViewCellStyle5;
             this.Qty.HeaderText = "Qty";
             this.Qty.Name = "Qty";
             this.Qty.ReadOnly = true;
@@ -202,10 +203,10 @@ namespace TouchPOS
             // 
             // Rate
             // 
-            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.TopCenter;
-            dataGridViewCellStyle2.Format = "N2";
-            dataGridViewCellStyle2.NullValue = null;
-            this.Rate.DefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.TopCenter;
+            dataGridViewCellStyle6.Format = "N2";
+            dataGridViewCellStyle6.NullValue = null;
+            this.Rate.DefaultCellStyle = dataGridViewCellStyle6;
             this.Rate.HeaderText = "Rate";
             this.Rate.Name = "Rate";
             this.Rate.ReadOnly = true;
@@ -213,10 +214,10 @@ namespace TouchPOS
             // 
             // Amount
             // 
-            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.TopCenter;
-            dataGridViewCellStyle3.Format = "N2";
-            dataGridViewCellStyle3.NullValue = null;
-            this.Amount.DefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle7.Alignment = System.Windows.Forms.DataGridViewContentAlignment.TopCenter;
+            dataGridViewCellStyle7.Format = "N2";
+            dataGridViewCellStyle7.NullValue = null;
+            this.Amount.DefaultCellStyle = dataGridViewCellStyle7;
             this.Amount.HeaderText = "Amount";
             this.Amount.Name = "Amount";
             this.Amount.ReadOnly = true;
@@ -248,9 +249,9 @@ namespace TouchPOS
             // 
             // Slno
             // 
-            dataGridViewCellStyle4.Format = "N0";
-            dataGridViewCellStyle4.NullValue = null;
-            this.Slno.DefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCellStyle8.Format = "N0";
+            dataGridViewCellStyle8.NullValue = null;
+            this.Slno.DefaultCellStyle = dataGridViewCellStyle8;
             this.Slno.HeaderText = "Slno";
             this.Slno.Name = "Slno";
             this.Slno.ReadOnly = true;
@@ -970,16 +971,16 @@ namespace TouchPOS
             // Txt_BarCode
             // 
             this.Txt_BarCode.Font = new System.Drawing.Font("Times New Roman", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Txt_BarCode.Location = new System.Drawing.Point(363, 690);
+            this.Txt_BarCode.Location = new System.Drawing.Point(425, 661);
             this.Txt_BarCode.Name = "Txt_BarCode";
-            this.Txt_BarCode.Size = new System.Drawing.Size(73, 26);
+            this.Txt_BarCode.Size = new System.Drawing.Size(19, 26);
             this.Txt_BarCode.TabIndex = 9;
             // 
             // Lbl_BarCode
             // 
             this.Lbl_BarCode.AutoSize = true;
             this.Lbl_BarCode.Font = new System.Drawing.Font("Times New Roman", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Lbl_BarCode.Location = new System.Drawing.Point(299, 696);
+            this.Lbl_BarCode.Location = new System.Drawing.Point(365, 672);
             this.Lbl_BarCode.Name = "Lbl_BarCode";
             this.Lbl_BarCode.Size = new System.Drawing.Size(58, 15);
             this.Lbl_BarCode.TabIndex = 8;
@@ -1066,15 +1067,25 @@ namespace TouchPOS
             // 
             // listBox_Items
             // 
-            this.listBox_Items.Font = new System.Drawing.Font("Times New Roman", 11F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.listBox_Items.Font = new System.Drawing.Font("Times New Roman", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.listBox_Items.FormattingEnabled = true;
-            this.listBox_Items.ItemHeight = 17;
+            this.listBox_Items.ItemHeight = 22;
             this.listBox_Items.Location = new System.Drawing.Point(22, 172);
             this.listBox_Items.Name = "listBox_Items";
-            this.listBox_Items.Size = new System.Drawing.Size(226, 276);
+            this.listBox_Items.Size = new System.Drawing.Size(226, 268);
             this.listBox_Items.TabIndex = 1;
             this.listBox_Items.Visible = false;
             this.listBox_Items.SelectedIndexChanged += new System.EventHandler(this.listBox_Items_SelectedIndexChanged);
+            // 
+            // Chk_Contain
+            // 
+            this.Chk_Contain.Font = new System.Drawing.Font("Times New Roman", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Chk_Contain.Location = new System.Drawing.Point(301, 694);
+            this.Chk_Contain.Name = "Chk_Contain";
+            this.Chk_Contain.Size = new System.Drawing.Size(123, 21);
+            this.Chk_Contain.TabIndex = 17;
+            this.Chk_Contain.Text = "Contains";
+            this.Chk_Contain.UseVisualStyleBackColor = true;
             // 
             // EntryForm
             // 
@@ -1082,10 +1093,9 @@ namespace TouchPOS
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Gainsboro;
             this.ClientSize = new System.Drawing.Size(1366, 768);
+            this.Controls.Add(this.Chk_Contain);
             this.Controls.Add(this.listBox_Items);
-            this.Controls.Add(this.Txt_BarCode);
             this.Controls.Add(this.panel7);
-            this.Controls.Add(this.Lbl_BarCode);
             this.Controls.Add(this.Chk_SearchByCode);
             this.Controls.Add(this.Txt_Remarks);
             this.Controls.Add(this.label8);
@@ -1097,6 +1107,8 @@ namespace TouchPOS
             this.Controls.Add(this.panel3);
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.panel1);
+            this.Controls.Add(this.Txt_BarCode);
+            this.Controls.Add(this.Lbl_BarCode);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "EntryForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
@@ -1211,5 +1223,6 @@ namespace TouchPOS
         private Button Cmd_D3_DBilling;
         private Button Cmd_D2_DBilling;
         private Button Cmd_D1_DBilling;
+        private CheckBox Chk_Contain;
     }
 }

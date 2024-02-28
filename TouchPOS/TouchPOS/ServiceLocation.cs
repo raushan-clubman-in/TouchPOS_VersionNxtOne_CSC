@@ -307,13 +307,13 @@ namespace TouchPOS
                         {
                             EF.UpdFlag = false;
                             GlobalVariable.ChairNo = ChNo;
-                            PaxForm PF = new PaxForm(this);
+                            PaxForm PF = new PaxForm();
                             PF.ShowDialog();
                             EF.Pax = PF.SPax;
                             if (PF.CancelFlag == true) { return; }
                             if (GlobalVariable.EntryType.ToUpper() == "MEMBER" || GlobalVariable.EntryType.ToUpper() == "BOTH")
                             {
-                                MemValidate MV = new MemValidate(this);
+                                MemValidate MV = new MemValidate();
                                 MV.LocCode = Int32.Parse(selectedBtn.Parent.Tag.ToString());
                                 MV.ShowDialog();
                                 if (MV.MCode == "" && MV.MemType == "M") { return; }
@@ -343,7 +343,7 @@ namespace TouchPOS
                         EF.Pax = 0;
                         if (GlobalVariable.EntryType.ToUpper() == "MEMBER" || GlobalVariable.EntryType.ToUpper() == "BOTH")
                         {
-                            MemValidate MV = new MemValidate(this);
+                            MemValidate MV = new MemValidate();
                             MV.LocCode = Int32.Parse(selectedBtn.Parent.Tag.ToString());
                             MV.ShowDialog();
                             if (MV.MCode == "" && MV.MemType == "M") { return; }
@@ -382,13 +382,13 @@ namespace TouchPOS
             else
             {
                 EF.UpdFlag = false;
-                PaxForm PF = new PaxForm(this);
+                PaxForm PF = new PaxForm();
                 PF.ShowDialog();
                 EF.Pax = PF.SPax;
                 if (PF.CancelFlag == true) { return; }
                 if (GlobalVariable.EntryType.ToUpper() == "MEMBER" || GlobalVariable.EntryType.ToUpper() == "BOTH")
                 {
-                    MemValidate MV = new MemValidate(this);
+                    MemValidate MV = new MemValidate();
                     MV.LocCode = lcode;
                     MV.ShowDialog();
                     if (MV.MCode == "" && MV.MemType == "M") { return; }

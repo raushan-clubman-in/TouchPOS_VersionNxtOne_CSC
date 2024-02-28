@@ -1,0 +1,23 @@
+    ---------------------------------
+    KOT PRINTER []
+    ---------------------------------
+    DATE:26-Feb-2024  05:46 PM
+    KOT No: KOT/163160/23-24  ORDER ID:2
+    MCODE  : B1988
+    MNAME  : RISHI BAJORIA
+    SERVER : 23 [ABDUL MAJID]
+    ---------------------------------
+                    
+    ---------------------------------
+    ITEM NAME                UOM  QTY
+    ---------------------------------
+    BACARDI BLACK           60 ML   1
+    BACARDI BLACK           60 ML   1
+
+
+
+
+    ---------------------------------
+    Total No of Item : 2
+    Prepared by : 5
+    ---------------------------------

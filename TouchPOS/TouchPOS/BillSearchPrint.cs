@@ -18,6 +18,7 @@ namespace TouchPOS
         GlobalClass GCon = new GlobalClass();
         ModifyPayForm MPF = new ModifyPayForm();
         public string FinYear1 = (GlobalVariable.FinStart.Year.ToString()) + "-" + (GlobalVariable.FinEnd.Year.ToString());
+        public int LocNum = 0;
 
         public BillSearchPrint()
         {
@@ -34,6 +35,8 @@ namespace TouchPOS
             //Utility.relocate(this, 1368, 768);
             //Utility.repositionForm(this, screenWidth, screenHeight);
             GCon.GetBillCloseDate();
+
+            Dtp_FromDate.Value = GlobalVariable.ServerDate;
 
             this.dataGridView1.DefaultCellStyle.Font = new System.Drawing.Font("Microsoft Sans Serif", 12.0F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.dataGridView1.ColumnHeadersDefaultCellStyle.Font = new Font("Microsoft Sans Serif", 12.0F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -72,9 +75,30 @@ namespace TouchPOS
 
         private void Cmd_Search_Click(object sender, EventArgs e)
         {
+            string locstring = "";
+            double TotalAmount = 0;
+            int totrow = 0;
+            if (LocNum > 0) 
+            {
+                locstring = " And LocCode = "+ LocNum +"";
+            }
+            else
+            { locstring = ""; }
             DataTable BillData = new DataTable();
-            sql = "SELECT BillDetails,BillDate,TotalAmount,SerType,LocName,(Select Top 1 TableNo From KOT_det K Where k.BILLDETAILS= BILL_HDR.BillDetails and Isnull(k.FinYear,'') = Isnull(BILL_HDR.FinYear,'')) as TableNo FROM BILL_HDR  ";
-            sql = sql + " WHERE BillDate = '" + Dtp_FromDate.Value.ToString("dd-MMM-yyyy") + "' And Isnull(DelFlag,'') <> 'Y' AND ISNULL(FinYear,'') = '" + FinYear1 + "' Order by BillDate Desc,BillDetails Desc ";
+            //sql = "SELECT BillDetails,BillDate,isnull(TotalAmount,0) as TotalAmount,SerType,LocName,(Select Top 1 TableNo From KOT_det K Where k.BILLDETAILS= BILL_HDR.BillDetails and Isnull(k.FinYear,'') = Isnull(BILL_HDR.FinYear,'')) as TableNo FROM BILL_HDR  ";
+            if (Txt_Search.Text == "") 
+            {
+                sql = "SELECT BillDetails,BillDate,Isnull(MCode,'') as MCode,Isnull(Mname,'') as Mname,isnull(TotalAmount,0) as TotalAmount,(Select Top 1 H.STWName From KOT_det K,KOT_HDR H Where K.KotDetails = H.KotDetails AND K.FinYear = H.FinYear And k.BILLDETAILS= BILL_HDR.BillDetails and Isnull(k.FinYear,'') = Isnull(BILL_HDR.FinYear,'')) as WaiterName,SerType,LocName,PaymentMode FROM BILL_HDR ";
+                sql = sql + " WHERE BillDate = '" + Dtp_FromDate.Value.ToString("dd-MMM-yyyy") + "' And Isnull(DelFlag,'') <> 'Y' AND ISNULL(FinYear,'') = '" + FinYear1 + "' " + locstring + " Order by BillDate Desc,BillDetails Desc ";
+            }
+            else 
+            {
+                sql = "SELECT BillDetails,BillDate,Isnull(MCode,'') as MCode,Isnull(Mname,'') as Mname,isnull(TotalAmount,0) as TotalAmount,(Select Top 1 H.STWName From KOT_det K,KOT_HDR H Where K.KotDetails = H.KotDetails AND K.FinYear = H.FinYear And k.BILLDETAILS= BILL_HDR.BillDetails and Isnull(k.FinYear,'') = Isnull(BILL_HDR.FinYear,'')) as WaiterName,SerType,LocName,PaymentMode FROM BILL_HDR  ";
+                //sql = sql + " WHERE BillDate = '" + Dtp_FromDate.Value.ToString("dd-MMM-yyyy") + "' And Isnull(DelFlag,'') <> 'Y' AND ISNULL(FinYear,'') = '" + FinYear1 + "' And (BillDetails Like '%" + Txt_Search.Text + "%' Or MCode Like '%" + Txt_Search.Text + "%' Or Mname Like '%" + Txt_Search.Text + "%') " + locstring + " Order by BillDate Desc,BillDetails Desc ";
+                //sql = sql + " WHERE BillDate = '" + Dtp_FromDate.Value.ToString("dd-MMM-yyyy") + "' And Isnull(DelFlag,'') <> 'Y' AND ISNULL(FinYear,'') = '" + FinYear1 + "' And (BillDetails Like '%" + Txt_Search.Text + "%' Or MCode Like '%" + Txt_Search.Text + "%' Or Mname Like '%" + Txt_Search.Text + "%' Or (Select Top 1 H.STWName From KOT_det K,KOT_HDR H Where K.KotDetails = H.KotDetails AND K.FinYear = H.FinYear And k.BILLDETAILS= BILL_HDR.BillDetails and Isnull(k.FinYear,'') = Isnull(BILL_HDR.FinYear,'')) Like '%" + Txt_Search.Text + "%') " + locstring + " Order by BillDate Desc,BillDetails Desc ";
+                sql = sql + " WHERE BillDate = '" + Dtp_FromDate.Value.ToString("dd-MMM-yyyy") + "' And Isnull(DelFlag,'') <> 'Y' AND ISNULL(FinYear,'') = '" + FinYear1 + "' And (BillDetails Like '%" + Txt_Search.Text + "%' Or MCode Like '%" + Txt_Search.Text + "%' Or (Select Top 1 H.STWName From KOT_det K,KOT_HDR H Where K.KotDetails = H.KotDetails AND K.FinYear = H.FinYear And k.BILLDETAILS= BILL_HDR.BillDetails and Isnull(k.FinYear,'') = Isnull(BILL_HDR.FinYear,'')) Like '%" + Txt_Search.Text + "%') " + locstring + " Order by BillDate Desc,BillDetails Desc ";
+            }
+            
             BillData = GCon.getDataSet(sql);
             if (BillData.Rows.Count > 0)
             {
@@ -86,13 +110,25 @@ namespace TouchPOS
                 {
                     dataGridView1.Rows.Add();
                     dataGridView1.Rows[i].Cells[0].Value = BillData.Rows[i].ItemArray[0];
-                    dataGridView1.Rows[i].Cells[1].Value = Strings.Format(BillData.Rows[i].ItemArray[1], "dd/MM/yyyy");
-                    dataGridView1.Rows[i].Cells[2].Value = Convert.ToDouble(BillData.Rows[i].ItemArray[2]);
+                    //dataGridView1.Rows[i].Cells[1].Value = Strings.Format(BillData.Rows[i].ItemArray[1], "dd/MM/yyyy");
+                    dataGridView1.Rows[i].Cells[1].Value = Convert.ToDateTime(BillData.Rows[i].ItemArray[1].ToString()).ToString("dd-MMM-yyyy");
+                    dataGridView1.Rows[i].Cells[2].Value = BillData.Rows[i].ItemArray[2];
                     dataGridView1.Rows[i].Cells[3].Value = BillData.Rows[i].ItemArray[3];
-                    dataGridView1.Rows[i].Cells[4].Value = BillData.Rows[i].ItemArray[4];
+                    dataGridView1.Rows[i].Cells[4].Value = Convert.ToDouble(BillData.Rows[i].ItemArray[4]);
+                    TotalAmount = TotalAmount + Convert.ToDouble(BillData.Rows[i].ItemArray[4]);
                     dataGridView1.Rows[i].Cells[5].Value = BillData.Rows[i].ItemArray[5];
+                    dataGridView1.Rows[i].Cells[6].Value = BillData.Rows[i].ItemArray[6];
+                    dataGridView1.Rows[i].Cells[7].Value = BillData.Rows[i].ItemArray[7];
+                    dataGridView1.Rows[i].Cells[8].Value = BillData.Rows[i].ItemArray[8];
                     dataGridView1.Rows[i].DefaultCellStyle = style;
                     dataGridView1.Rows[i].Height = 30;
+                    totrow = i;
+                }
+                if (TotalAmount > 0) 
+                {
+                    //dataGridView1.Rows.Add();
+                    dataGridView1.Rows[totrow + 1].Cells[3].Value = "Total";
+                    dataGridView1.Rows[totrow+1].Cells[4].Value = Convert.ToDouble(TotalAmount);
                 }
             }
         }
@@ -113,10 +149,22 @@ namespace TouchPOS
             {
                 WindowsPring(CBillNo, "D");
             }
+            else if (GlobalVariable.gCompName == "HBCC")
+            {
+                MPF.gPrint = true;
+                //MPF.PrintOperation_HBCC(CBillNo, "D");
+                //WindowsPring(CBillNo, "D");
+            }
+            else if (GlobalVariable.gCompName == "CSC")
+            {
+                MPF.gPrint = false;
+                MPF.PrintOperation_CSC(CBillNo, "D");
+            }
             else 
             {
                 MPF.gPrint = true;
                 MPF.PrintOperation(CBillNo, "D");
+                //WindowsPring(CBillNo, "D");
             }
             List.Clear();
             sql = "Insert Into BillDuplicatePrint (BillNo,UserName,TakenDate) Values ('" + CBillNo + "','" + GlobalVariable.gUserName + "',getdate()) ";
@@ -152,13 +200,13 @@ namespace TouchPOS
 
             //RPS.PrintOptions.PaperSize = CrystalDecisions.Shared.PaperSize.DefaultPaperSize;
 
-            string Add1 = Convert.ToString(GCon.getValue(" SELECT TOP 1 ISNULL(ADD1,'') FROM MASTER..CLUBMASTER WHERE DATAFILE IN (SELECT DB_NAME())"));
-            string Add2 = Convert.ToString(GCon.getValue(" SELECT TOP 1 ISNULL(ADD2,'') FROM MASTER..CLUBMASTER WHERE DATAFILE IN (SELECT DB_NAME())"));
-            string City = Convert.ToString(GCon.getValue(" SELECT TOP 1 ISNULL(CITY,'') FROM MASTER..CLUBMASTER WHERE DATAFILE IN (SELECT DB_NAME())"));
-            string PinNo = Convert.ToString(GCon.getValue(" SELECT TOP 1 ISNULL(Pincode,'') FROM MASTER..CLUBMASTER WHERE DATAFILE IN (SELECT DB_NAME())"));
-            string GSTIN = Convert.ToString(GCon.getValue(" SELECT TOP 1 ISNULL(GSTINNO,'') FROM MASTER..CLUBMASTER WHERE DATAFILE IN (SELECT DB_NAME())"));
-            string Phone = Convert.ToString(GCon.getValue(" SELECT TOP 1 ISNULL(Phone1,'') FROM MASTER..CLUBMASTER WHERE DATAFILE IN (SELECT DB_NAME())"));
-            string Web = Convert.ToString(GCon.getValue(" SELECT TOP 1 ISNULL(WebSite,'') FROM MASTER..CLUBMASTER WHERE DATAFILE IN (SELECT DB_NAME())"));
+            string Add1 = Convert.ToString(GCon.getValue(" SELECT TOP 1 ISNULL(ADD1,'') FROM MASTERADMIN..CLUBMASTER WHERE DATAFILE IN (SELECT DB_NAME())"));
+            string Add2 = Convert.ToString(GCon.getValue(" SELECT TOP 1 ISNULL(ADD2,'') FROM MASTERADMIN..CLUBMASTER WHERE DATAFILE IN (SELECT DB_NAME())"));
+            string City = Convert.ToString(GCon.getValue(" SELECT TOP 1 ISNULL(CITY,'') FROM MASTERADMIN..CLUBMASTER WHERE DATAFILE IN (SELECT DB_NAME())"));
+            string PinNo = Convert.ToString(GCon.getValue(" SELECT TOP 1 ISNULL(Pincode,'') FROM MASTERADMIN..CLUBMASTER WHERE DATAFILE IN (SELECT DB_NAME())"));
+            string GSTIN = Convert.ToString(GCon.getValue(" SELECT TOP 1 ISNULL(GSTINNO,'') FROM MASTERADMIN..CLUBMASTER WHERE DATAFILE IN (SELECT DB_NAME())"));
+            string Phone = Convert.ToString(GCon.getValue(" SELECT TOP 1 ISNULL(Phone1,'') FROM MASTERADMIN..CLUBMASTER WHERE DATAFILE IN (SELECT DB_NAME())"));
+            string Web = Convert.ToString(GCon.getValue(" SELECT TOP 1 ISNULL(WebSite,'') FROM MASTERADMIN..CLUBMASTER WHERE DATAFILE IN (SELECT DB_NAME())"));
             string SecLine = Add2 + ", " + City + "-" + PinNo;
 
             sql = "SELECT BILLDETAILS as BILLDETAILSTAX,A.taxdesc as TAXCODE,SUM(T.TAXAMT) - (sum(((T.TAXAMT * Isnull(ItemDiscPerc,0)) /100 ))) AS TAXAMT FROM KOT_DET_TAX T,KOT_DET D,accountstaxmaster A WHERE ISNULL(T.KOTDETAILS,'') = ISNULL(D.KOTDETAILS,'') AND ISNULL(T.ITEMCODE,'') = ISNULL(D.ITEMCODE,'') AND ISNULL(T.SLNO,0) = ISNULL(D.SLNO,0) AND ISNULL(T.FinYear,'') = ISNULL(D.FinYear,'') ";
@@ -170,7 +218,7 @@ namespace TouchPOS
                 RPS.SetDataSource(GlobalVariable.gdataset);
                 rv.crystalReportViewer1.ReportSource = RPS;
             }
-            sql1 = " SELECT BILLNO AS BillDetails,PAYMENTMODE,PAYAMOUNT AS TotalAmount FROM BILLSETTLEMENT WHERE BILLNO = '" + Bno + "' AND ISNULL(FinYear,'') = '" + FinYear1 + "' ORDER BY AUTOID ";
+            sql1 = " SELECT BILLNO AS BillDetails,PAYMENTMODE,PAYAMOUNT AS TotalAmount FROM BILLSETTLEMENT WHERE BILLNO = '" + Bno + "' AND ISNULL(FinYear,'') = '" + FinYear1 + "' ORDER BY id ";
             GCon.getDataSet1(sql1, "BILL_HDR");
             if (GlobalVariable.gdataset.Tables["BILL_HDR"].Rows.Count > 0)
             {
@@ -202,7 +250,7 @@ namespace TouchPOS
             DataTable ARMData = new DataTable();
             DataTable RoomData = new DataTable();
             DataTable CardData = new DataTable();
-            sql = "SELECT MCODE,MNAME,CURENTSTATUS FROM MEMBERMASTER Where MCode IN (SELECT MCODE FROM BILL_HDR WHERE BILLDETAILS = '" + Bno + "' AND ISNULL(FinYear,'') = '" + FinYear1 + "') ";
+            sql = "SELECT MCODE,MNAME,CurrentStatus as CURENTSTATUS FROM MEMBERMASTER Where MCode IN (SELECT MCODE FROM BILL_HDR WHERE BILLDETAILS = '" + Bno + "' AND ISNULL(FinYear,'') = '" + FinYear1 + "') ";
             MData = GCon.getDataSet(sql);
             if (MData.Rows.Count > 0)
             {
@@ -407,6 +455,39 @@ namespace TouchPOS
 
             }
 
+        }
+
+        private void Cmd_View_Click(object sender, EventArgs e)
+        {
+            string CBillNo = "";
+            ArrayList List = new ArrayList();
+            int rowindex = dataGridView1.CurrentRow.Index;
+            CBillNo = dataGridView1.Rows[rowindex].Cells[0].Value.ToString();
+            //WindowsPring(CBillNo, "D");
+            if (GlobalVariable.gCompName == "SKYYE" || GlobalVariable.gCompName == "ITCD" || GlobalVariable.gCompName == "TRNG")
+            {
+                //WindowsPring(CBillNo, "D");
+            }
+            else if (GlobalVariable.gCompName == "HBCC")
+            {
+                //MPF.gPrint = false;
+                //MPF.PrintOperation_HBCC(CBillNo, "D");
+                //WindowsPring(CBillNo, "D");
+            }
+            else if (GlobalVariable.gCompName == "CSC") 
+            {
+                MPF.gPrint = false;
+                MPF.PrintOperation_CSC(CBillNo, "D");
+            }
+            else
+            {
+                MPF.gPrint = false;
+                MPF.PrintOperation(CBillNo, "D");
+            }
+            //List.Clear();
+            //sql = "Insert Into BillDuplicatePrint (BillNo,UserName,TakenDate) Values ('" + CBillNo + "','" + GlobalVariable.gUserName + "',getdate()) ";
+            //List.Add(sql);
+            //if (GCon.Moretransaction(List) > 0) { List.Clear(); }
         }
     }
 }

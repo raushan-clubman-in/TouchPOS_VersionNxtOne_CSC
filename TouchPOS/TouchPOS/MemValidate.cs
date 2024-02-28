@@ -33,11 +33,11 @@ namespace TouchPOS
         private string osk = "C:/Windows/System32/osk.exe";
         private Process oskProcess;
 
-        public readonly ServiceLocation _form1;
+        //public readonly ServiceLocation _form1;
 
-        public MemValidate(ServiceLocation form1)
+        public MemValidate()
         {
-            _form1 = form1;
+            //_form1 = form1;
             InitializeComponent();
         }
 
@@ -309,6 +309,7 @@ namespace TouchPOS
                         Txt_Cardid.Text = GBL_SMARTCARDSNO;
                     }
                 }
+               
                 if (GlobalVariable.gCompName == "CSC") 
                 {
                     sql = "SELECT [16_DIGIT_CODE] as DigitCode FROM SM_CARDFILE_HDR WHERE ([16_DIGIT_CODE] = '" + GBL_SMARTCARDSNO + "' OR ISNULL(NEWDIGITCODE,'') = '" + GBL_SMARTCARDSNO + "') And  ISNULL(NEWDIGITCODE,'') <> '' ";

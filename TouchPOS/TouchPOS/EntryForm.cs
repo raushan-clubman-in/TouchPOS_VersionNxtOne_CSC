@@ -86,7 +86,7 @@ namespace TouchPOS
             GCon.dataOperation(1, sql);
             GCon.GetBillCloseDate();
             //int ONo = Convert.ToInt16(GCon.getValue("SELECT  ISNULL(MAX(Cast(SUBSTRING(KOTno,1,6) As Numeric)),0)  FROM KOT_HDR  WHERE SALETYPE ='SALE' AND ISNULL(TTYPE,'') <> 'S' ")) + 1;
-            int ONo = Convert.ToInt16(GCon.getValue("SELECT  ISNULL(MAX(Cast(SUBSTRING(KOTno,1,6) As Numeric)),0)  FROM KOT_HDR  WHERE SALETYPE ='SALE' AND ISNULL(TTYPE,'') <> 'S' AND DOCTYPE = '" + DocType + "' AND ISNULL(FinYear,'') = '" + FinYear1 + "' ")) + 1;
+            int ONo = Convert.ToInt32(GCon.getValue("SELECT  ISNULL(MAX(Cast(SUBSTRING(KOTno,1,6) As Numeric)),0)  FROM KOT_HDR  WHERE SALETYPE ='SALE' AND ISNULL(TTYPE,'') <> 'S' AND DOCTYPE = '" + DocType + "' AND ISNULL(FinYear,'') = '" + FinYear1 + "' ")) + 1;
             label1.Text = "Staff:" + GlobalVariable.gUserName + "/ SalesDates:" + GlobalVariable.ServerDate.ToString("dd MMM") + "/ Order No : " + ONo;
             if (GlobalVariable.gCompName == "CSC")
             {
@@ -195,7 +195,7 @@ namespace TouchPOS
                         }
                     }
                     DataTable KotMem = new DataTable();
-                    sql = "Select ISNULL(MCode,'') AS MCode,ISNULL(Mname,'') AS Mname,ISNULL(CARDHOLDERCODE,'') AS CARDHOLDERCODE,ISNULL(CARDHOLDERNAME,'') AS CARDHOLDERNAME,ISNULL([16_DIGIT_CODE],'') AS DCODE,ISNULL([STWNAME],'') AS STWNAME,ISNULL(Remarks,'') AS Remarks,ISNULL(NCFlag,'N') AS NCFlag,ISNULL(NCCategory,'') AS NCCategory from KOT_HDR Where Kotdetails = '" + KOrderNo + "' AND ISNULL(FinYear,'') = '" + FinYear1 + "' ";
+                    sql = "Select ISNULL(MCode,'') AS MCode,ISNULL(Mname,'') AS Mname,ISNULL(CARDHOLDERCODE,'') AS CARDHOLDERCODE,ISNULL(CARDHOLDERNAME,'') AS CARDHOLDERNAME,ISNULL([16_DIGIT_CODE],'') AS DCODE,ISNULL([STWNAME],'') AS STWNAME,ISNULL(Remarks,'') AS Remarks,ISNULL(NCFlag,'N') AS NCFlag,ISNULL(NCCategory,'') AS NCCategory,ISNULL([STWCODE],'') AS STWCODE from KOT_HDR Where Kotdetails = '" + KOrderNo + "' AND ISNULL(FinYear,'') = '" + FinYear1 + "' ";
                     KotMem = GCon.getDataSet(sql);
                     if (KotMem.Rows.Count > 0) 
                     {
@@ -204,7 +204,8 @@ namespace TouchPOS
                         CardHolderCode = KotMem.Rows[0].ItemArray[2].ToString();
                         CardHolderName = KotMem.Rows[0].ItemArray[3].ToString();
                         DigitCode = KotMem.Rows[0].ItemArray[4].ToString();
-                        Cmb_Steward.Text = KotMem.Rows[0].ItemArray[5].ToString();
+                        //Cmb_Steward.Text = KotMem.Rows[0].ItemArray[5].ToString();
+                        Cmb_Steward.Text = KotMem.Rows[0].ItemArray[9].ToString();
                         Txt_Remarks.Text = KotMem.Rows[0].ItemArray[6].ToString();
                         if (KotMem.Rows[0].ItemArray[7].ToString() == "Y")
                         {
@@ -281,7 +282,7 @@ namespace TouchPOS
             sql = "SELECT ServerName,ServerCode FROM ServerMaster wHERE SERVERTYPE = 'STEWARD' AND ISNULL(FREEZE,'') <> 'Y' ORDER BY 1 ";
             if (GlobalVariable.gCompName == "CSC") 
             {
-                sql = "SELECT ServerName,ServerCode FROM ServerMaster wHERE ISNULL(FREEZE,'') <> 'Y' ORDER BY 1 ";
+                sql = "SELECT ServerName,ServerCode FROM ServerMaster wHERE ISNULL(FREEZE,'') <> 'Y' ORDER BY cast(servercode as int) ";
             }
             else if (GlobalVariable.gCompName == "CFC")
             {
@@ -297,8 +298,10 @@ namespace TouchPOS
                     //Cmb_Steward.Items.Add(new { Text = dt.Rows[i]["ServerName"].ToString(), Value = dt.Rows[i]["ServerCode"].ToString() });
                 }
                 Cmb_Steward.DataSource = dt;
-                Cmb_Steward.DisplayMember = "ServerName";
-                Cmb_Steward.ValueMember = "ServerCode";
+                //Cmb_Steward.DisplayMember = "ServerName";
+                //Cmb_Steward.ValueMember = "ServerCode";
+                Cmb_Steward.DisplayMember = "ServerCode";
+                Cmb_Steward.ValueMember = "ServerName";
                
                 Cmb_Steward.SelectedIndex = 0;
             }
@@ -333,7 +336,8 @@ namespace TouchPOS
 
             if (GlobalVariable.ServiceType == "Dine-In")
             {
-                ServiceLocation SL = new ServiceLocation();
+                //ServiceLocation SL = new ServiceLocation();
+                ServiceLocation_New SL = new ServiceLocation_New();
                 GlobalVariable.SLocation = "";
                 GlobalVariable.TableNo = "";
                 GlobalVariable.ChairNo = 1;
@@ -1528,12 +1532,12 @@ namespace TouchPOS
             sql = "SELECT DISTINCT Itemcode,ItemDesc FROM ItemMaster WHERE ISNULL(FREEZE,'') <> 'Y' And ItemCode IN (SELECT ItemCode FROM POSMENULINK WHERE POS IN (Select PosCode from ServiceLocation_Det WHERE LocCode =" + Loccode + ")) ";
             if (GlobalVariable.gCompName == "CSC") 
             {
-                sql = "SELECT DISTINCT Itemcode,ItemDesc+'=>'+Itemcode As ItemDesc FROM ItemMaster WHERE ISNULL(FREEZE,'') <> 'Y' And ItemCode IN (SELECT ItemCode FROM POSMENULINK WHERE POS IN (Select PosCode from ServiceLocation_Det WHERE LocCode =" + Loccode + ")) ";
+                sql = "SELECT DISTINCT Itemcode+'=>'+ItemDesc as Itemcode,ItemDesc+'=>'+Itemcode As ItemDesc FROM ItemMaster WHERE ISNULL(FREEZE,'') <> 'Y' And ItemCode IN (SELECT ItemCode FROM POSMENULINK WHERE POS IN (Select PosCode from ServiceLocation_Det WHERE LocCode =" + Loccode + ")) ";
             }
             dtPosts = GCon.getDataSet(sql);
             string[] postSource = dtPosts
                     .AsEnumerable()
-                    .Select<System.Data.DataRow, String>(x => x.Field<String>("ItemDesc"))
+                    .Select<System.Data.DataRow, String>(x => x.Field<String>("Itemcode"))
                     .ToArray();
 
             NwSearchSource.AddRange(postSource);
@@ -1551,7 +1555,7 @@ namespace TouchPOS
         }
 
         private void text_auto_nw_TextChanged(object sender, EventArgs e)
-        {
+       {
             Int32 maxlen = 1;
             listBox_Items.Items.Clear();
             if (text_auto_nw.Text.Length == 0)
@@ -1561,39 +1565,72 @@ namespace TouchPOS
             }
 
             foreach (string s in text_auto_nw.AutoCompleteCustomSource)
-            { 
-                if(s.ToUpper().Contains(text_auto_nw.Text.ToUpper()))
+            {
+                //if (s.ToUpper().Contains(text_auto_nw.Text.ToUpper()))
+                //{
+                //    listBox_Items.Items.Add(s);
+                //    listBox_Items.Visible = true;
+                //    //maxlen = s.Length;
+                //    if (maxlen < s.Length)
+                //    { maxlen = s.Length; }
+                //}
+                if (Chk_Contain.Checked == true) 
                 {
-                   listBox_Items.Items.Add(s);
-                   listBox_Items.Visible = true;
-                   //maxlen = s.Length;
-                   if (maxlen < s.Length)
-                   { maxlen = s.Length; }
-                }             
+                    if (s.ToUpper().Contains(text_auto_nw.Text.ToUpper()))
+                    {
+                        listBox_Items.Items.Add(s);
+                        listBox_Items.Visible = true;
+                        //maxlen = s.Length;
+                        if (maxlen < s.Length)
+                        { maxlen = s.Length; }
+                    }
+                }
+                else 
+                {
+                    if (s.ToUpper().StartsWith(text_auto_nw.Text.ToUpper()))
+                    {
+                        listBox_Items.Items.Add(s);
+                        listBox_Items.Visible = true;
+                        //maxlen = s.Length;
+                        if (maxlen < s.Length)
+                        { maxlen = s.Length; }
+                    }
+                }
             }
             if (11 * maxlen < 226) { listBox_Items.Width = 226; }
-            else { listBox_Items.Width = 11 * maxlen; }
+            else { listBox_Items.Width = 11 * maxlen + 50; }
                                                                                                                                                                                                                                                                                  
         }
 
         private void AutoCompleteItem()
         {
-            this.Txt_Item.DataBindings.Clear();
+            //this.Txt_Item.DataBindings.Clear();
             sql = "SELECT DISTINCT Itemcode,ItemDesc FROM ItemMaster WHERE ISNULL(FREEZE,'') <> 'Y' And ItemCode IN (SELECT ItemCode FROM POSMENULINK WHERE POS IN (Select PosCode from ServiceLocation_Det WHERE LocCode =" + Loccode + ")) ";
+            if (GlobalVariable.gCompName == "CSC")
+            {
+                sql = "SELECT DISTINCT Itemcode,ItemDesc+'=>'+Itemcode As ItemDesc FROM ItemMaster WHERE ISNULL(FREEZE,'') <> 'Y' And ItemCode IN (SELECT ItemCode FROM POSMENULINK WHERE POS IN (Select PosCode from ServiceLocation_Det WHERE LocCode =" + Loccode + ")) ";
+            }
+
             dtPostsitem = GCon.getDataSet(sql);
             string[] postSource2 = dtPostsitem
                     .AsEnumerable()
                     .Select<System.Data.DataRow, String>(x => x.Field<String>("Itemcode"))
                     .ToArray();
-            var source2 = new AutoCompleteStringCollection();
-            source2.AddRange(postSource2);
-            Txt_Item.AutoCompleteCustomSource = source2;
-            Txt_Item.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
-            Txt_Item.AutoCompleteSource = AutoCompleteSource.CustomSource;
-            // AutoCompleteStringCollection col = new AutoCompleteStringCollection();
-            this.Txt_Item.DataBindings.Add("Text", dtPostsitem, "Itemcode");
-            //dtView = new DataView(dtPosts);
-            this.Txt_Item.Text = "";
+            //var source2 = new AutoCompleteStringCollection();
+            //source2.AddRange(postSource2);
+            //Txt_Item.AutoCompleteCustomSource = source2;
+            //Txt_Item.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+            //Txt_Item.AutoCompleteSource = AutoCompleteSource.CustomSource;
+            //// AutoCompleteStringCollection col = new AutoCompleteStringCollection();
+            //this.Txt_Item.DataBindings.Add("Text", dtPostsitem, "Itemcode");
+            ////dtView = new DataView(dtPosts);
+            //this.Txt_Item.Text = "";
+
+            NwSearchSource.AddRange(postSource2);
+            text_auto_nw.AutoCompleteCustomSource = NwSearchSource;
+            text_auto_nw.AutoCompleteMode = AutoCompleteMode.None;
+            text_auto_nw.AutoCompleteSource = AutoCompleteSource.CustomSource;
+
         }
 
         private void AutoCompleteBarCode()
@@ -1665,8 +1702,8 @@ namespace TouchPOS
                 CheckPrintFlag = GCon.getDataSet(sql);
                 if (CheckPrintFlag.Rows.Count > 0)
                 {
-                    MessageBox.Show("Check Print Done, You can't Modify");
-                    return;
+                    //MessageBox.Show("Check Print Done, You can't Modify");
+                    //return;
                 }
 
                 //BindingManagerBase b = this.Txt_Item.BindingContext[dtPosts, "ItemDesc"];
@@ -1689,8 +1726,10 @@ namespace TouchPOS
                     string[] SplitCode = { "", "" };
                     SplitCode = Txt_Item.Text.Split(new[] { "=>" }, StringSplitOptions.RemoveEmptyEntries);
                     Txt_Item.Text = SplitCode[0].ToString();
+                    //sql = "SELECT I.ItemCode,I.ItemDesc,R.ItemRate,P.Pos as rposcode,UOM,Isnull(R.PurcahseRate,0) as PurcahseRate,Isnull(openfacility,'') as Openfacility FROM ITEMMASTER I,RATEMASTER R,PosMenuLink P WHERE I.ITEMCODE = R.ITEMCODE and i.itemcode = p.ItemCode  ";
+                    //sql = sql + " AND I.ItemDesc = '" + Txt_Item.Text.Replace("'", "''") + "' AND  P.Pos IN (SELECT PosCode FROM ServiceLocation_Det WHERE LOCCODE = " + Loccode + ") AND '" + GlobalVariable.ServerDate.ToString("dd-MMM-yyyy") + "' BETWEEN r.StartingDate And isnull(r.Endingdate,getdate())";
                     sql = "SELECT I.ItemCode,I.ItemDesc,R.ItemRate,P.Pos as rposcode,UOM,Isnull(R.PurcahseRate,0) as PurcahseRate,Isnull(openfacility,'') as Openfacility FROM ITEMMASTER I,RATEMASTER R,PosMenuLink P WHERE I.ITEMCODE = R.ITEMCODE and i.itemcode = p.ItemCode  ";
-                    sql = sql + " AND I.ItemDesc = '" + Txt_Item.Text.Replace("'", "''") + "' AND  P.Pos IN (SELECT PosCode FROM ServiceLocation_Det WHERE LOCCODE = " + Loccode + ") AND '" + GlobalVariable.ServerDate.ToString("dd-MMM-yyyy") + "' BETWEEN r.StartingDate And isnull(r.Endingdate,getdate())";
+                    sql = sql + " AND I.ItemCode = '" + Txt_Item.Text.Replace("'", "''") + "' AND  P.Pos IN (SELECT PosCode FROM ServiceLocation_Det WHERE LOCCODE = " + Loccode + ") AND '" + GlobalVariable.ServerDate.ToString("dd-MMM-yyyy") + "' BETWEEN r.StartingDate And isnull(r.Endingdate,getdate())";
                 }
                 else
                 {
@@ -1724,7 +1763,7 @@ namespace TouchPOS
                     dataGridView1.Rows[RowCnt - 1].Cells[2].Value = 1;
                     dataGridView1.Rows[RowCnt - 1].Cells[3].Value = Rate;
 
-                    sql = " select P.Pos,M.POSDesc from PosMenuLink P,PosMaster M where P.Pos = M.Poscode And itemcode = '" + dr["Itemcode"].ToString() + "' And P.Pos In (Select PosCode from ServiceLocation_Det Where LocCode = " + Loccode + ")";
+                    sql = " select P.Pos,M.POSDesc from PosMenuLink P,PosMaster M where P.Pos = M.Poscode And itemcode = '" + dr["Itemcode"].ToString() + "' And P.Pos In (Select PosCode from ServiceLocation_Det Where LocCode = " + Loccode + ") ORDER BY M.POSDesc";
                     Posdt = GCon.getDataSet(sql);
                     if (Posdt.Rows.Count > 1)
                     {
@@ -2390,7 +2429,7 @@ namespace TouchPOS
                     DateTime Sdate = Convert.ToDateTime(GlobalVariable.ServerDate);
                     //KotNo = Convert.ToInt16(GCon.getValue("SELECT  ISNULL(MAX(Cast(SUBSTRING(KOTno,1,6) As Numeric)),0)  FROM KOT_HDR  WHERE SALETYPE ='SALE' AND ISNULL(TTYPE,'') <> 'S' ")) + 1;
                     //KotNo = Convert.ToInt16(GCon.getValue("SELECT  ISNULL(MAX(Cast(SUBSTRING(KOTno,1,6) As Numeric)),0)  FROM KOT_HDR  WHERE SALETYPE ='SALE' AND ISNULL(TTYPE,'') <> 'S' AND DOCTYPE = '" + DocType + "' ")) + 1;
-                    KotNo = Convert.ToInt16(GCon.getValue("SELECT  ISNULL(MAX(Cast(SUBSTRING(KOTno,1,6) As Numeric)),0)  FROM KOT_HDR  WHERE SALETYPE ='SALE' AND ISNULL(TTYPE,'') <> 'S' AND DOCTYPE = '" + DocType + "' AND ISNULL(FinYear,'') = '" + FinYear1 + "' ")) + 1;
+                    KotNo = Convert.ToInt32(GCon.getValue("SELECT  ISNULL(MAX(Cast(SUBSTRING(KOTno,1,6) As Numeric)),0)  FROM KOT_HDR  WHERE SALETYPE ='SALE' AND ISNULL(TTYPE,'') <> 'S' AND DOCTYPE = '" + DocType + "' AND ISNULL(FinYear,'') = '" + FinYear1 + "' ")) + 1;
                     //kotdetails = DocType+"/"+ KotNo.ToString("000000") + "/" + FinYear;
                     kotNo1 = KotNo.ToString("000000");
                     kotdetails = DocType + "/" + KotNo.ToString("000000");
@@ -3043,7 +3082,7 @@ namespace TouchPOS
                         }
                         else 
                         {
-                            ServiceLocation SL = new ServiceLocation();
+                            ServiceLocation_New SL = new ServiceLocation_New();
                             SL.Show();
                             this.Close();
                         }

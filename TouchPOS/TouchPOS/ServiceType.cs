@@ -157,7 +157,8 @@ namespace TouchPOS
             GlobalVariable.ServiceType = "Dine-In";
             if (GlobalVariable.gCompName == "CSC")
             {
-                ServiceLocationDisplay SL = new ServiceLocationDisplay();
+                //ServiceLocationDisplay SL = new ServiceLocationDisplay();
+                ServiceLocation_New SL = new ServiceLocation_New();
                 SL.Show();
             }
             else 

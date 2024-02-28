@@ -1423,6 +1423,320 @@ namespace TouchPOS
             }
         }
 
+        public void PrintOperation_CSC(string Bno, string Type)
+        {
+            int rowj = 0;
+            int CountItem = 0, MtNo = 0;
+            long Vrowcount = 0;
+            string vFilepath = null;
+            string vOutfile = null;
+            DataTable PData = new DataTable();
+            DataTable TData = new DataTable();
+            DataTable SData = new DataTable();
+            DataTable MemData = new DataTable();
+            DataTable OutData = new DataTable();
+            StreamWriter Filewrite = default(StreamWriter);
+            Double Total = 0, BillTotal = 0, TaxTotal = 0, OthTotal = 0, MFTotal = 0, DiscAmount = 0;
+            Double DisPercent = 0;
+            Double ExtraTips = 0, RefundAmt = 0;
+            string MNm = "", MAdd = "", MGst = "", MStcode = "", Prepaidby = "", KRemarks = "",MemberPrint = "";
+            string CardCode = "", CardName = "", BillPaymentMode = "";
+            VBMath.Randomize();
+            vOutfile = Strings.Mid("BIL" + (VBMath.Rnd() * 800000), 1, 8);
+            vOutfile = vOutfile + DateTime.Now.ToString("ddMMyyyy") + DateTime.Now.ToString("HHmmss");
+            vFilepath = Application.StartupPath + @"\Reports\" + vOutfile + ".txt";
+            DateTime BDatePrint = GlobalVariable.ServerDate;
+
+            const string ESC1 = "\u001B";
+            const string GS1 = "\u001D";
+            const string BoldOn = ESC1 + "E" + "\u0001";
+            const string BoldOff = ESC1 + "E" + "\0";
+            const string DoubleOn = GS1 + "!" + "\u0011";  // 2x sized text (double-high + double-wide)
+            const string DoubleOff = GS1 + "!" + "\0";
+
+            //int NOdrNo = Convert.ToInt16(GCon.getValue("select Isnull(Max(isnull(OrderNo,0)),0) as OrderNo from KOT_det where kotdetails = '" + KOrderNo + "'"));
+            string Add1 = Convert.ToString(GCon.getValue(" SELECT Top 1 ISNULL(ADD1,'') FROM MASTER..CLUBMASTER WHERE DATAFILE IN (SELECT DB_NAME())"));
+            string Add2 = Convert.ToString(GCon.getValue(" SELECT Top 1 ISNULL(ADD2,'') FROM MASTER..CLUBMASTER WHERE DATAFILE IN (SELECT DB_NAME())"));
+            string City = Convert.ToString(GCon.getValue(" SELECT Top 1 ISNULL(CITY,'') FROM MASTER..CLUBMASTER WHERE DATAFILE IN (SELECT DB_NAME())"));
+            string PinNo = Convert.ToString(GCon.getValue(" SELECT Top 1 ISNULL(Pincode,'') FROM MASTER..CLUBMASTER WHERE DATAFILE IN (SELECT DB_NAME())"));
+            string GSTIN = Convert.ToString(GCon.getValue(" SELECT Top 1 ISNULL(GSTINNO,'') FROM MASTER..CLUBMASTER WHERE DATAFILE IN (SELECT DB_NAME())"));
+            string Phone = Convert.ToString(GCon.getValue(" SELECT Top 1 ISNULL(Phone1,'') FROM MASTER..CLUBMASTER WHERE DATAFILE IN (SELECT DB_NAME())"));
+            string SecLine = Add2 + ", " + City + "-" + PinNo;
+            string ItemHSN = "";
+
+            sql = "SELECT b.BillDetails,D.KOTDETAILS,D.Kotdate,B.Billdate,B.BillTime,b.Adddatetime,b.Adduserid,b.LOCNAME,H.TABLENO,H.Covers,ITEMCODE,ITEMDESC,UOM,QTY,RATE,AMOUNT,isnull(OrderNo,0) as OrderNo,(isnull(d.packamount,0)+isnull(d.TipsAmt,0)+isnull(d.AdCgsAmt,0)+isnull(d.PartyAmt,0)+isnull(d.RoomAmt,0)) as OthAmount,(isnull(d.ModifierCharges,0)) as MFAmount,Isnull(ItemDiscPerc,0) as ItemDiscPerc,H.STWCODE,H.STWNAME,(select isnull(HSNNO,'NA') from itemmaster I Where I.ItemCode = D.ITEMCODE) AS HSNNO,Isnull(B.Mcode,'') as MCode,Isnull(B.MName,'') as MName,Isnull(B.CARDHOLDERCODE,'') as CARDHOLDERCODE,Isnull(B.CARDHOLDERNAME,'') as CARDHOLDERNAME,Isnull(b.PayMentmode,'') as PayMentmode ";
+            sql = sql + " FROM KOT_DET D,KOT_HDR H,BILL_HDR b WHERE D.KOTDETAILS = H.Kotdetails AND ISNULL(D.FinYear,'') = ISNULL(H.FinYear,'') AND D.BILLDETAILS = b.BillDetails AND ISNULL(D.FinYear,'') = ISNULL(B.FinYear,'')  AND B.BillDetails = '" + Bno + "'  AND ISNULL(KOTSTATUS,'') <> 'Y' AND ISNULL(B.FinYear,'') = '" + FinYear1 + "' ORDER BY HSNNO ";
+            PData = GCon.getDataSet(sql);
+            if (PData.Rows.Count > 0)
+            {
+                //DisPercent = Convert.ToDouble(GCon.getValue(" SELECT Isnull(DiscPercent,0) as DiscPercent From Bill_Hdr Where Billdetails = '" + Bno + "' AND ISNULL(FinYear,'') = '" + FinYear1 + "' "));
+                Filewrite = File.AppendText(vFilepath);
+                sql = "SELECT MNAME,ISNULL(CONTADD1,'')+' '+ISNULL(CONTADD2,'')+' '+ISNULL(CONTADD3,'') AS MADD,ISNULL(GSTINNO,'NA') AS GSTINNO,ISNULL(MEMSTCODE,'NA') AS MEMSTCODE FROM MEMBERMASTER WHERE MCODE = '" + PData.Rows[0].ItemArray[23].ToString() +"'";
+                MemData = GCon.getDataSet(sql);
+                if (MemData.Rows.Count > 0)
+                {
+                    var RDataMem = MemData.Rows[0];
+                    MNm = RDataMem["MNAME"].ToString();
+                    MAdd = RDataMem["MADD"].ToString();
+                    MGst = RDataMem["GSTINNO"].ToString();
+                    MStcode = RDataMem["MEMSTCODE"].ToString();
+                }
+                else 
+                {
+                    MNm = "NA";
+                    MAdd = "NA";
+                    MGst = "NA";
+                    MStcode = "NA";
+                }
+
+                for (rowj = 0; rowj <= PData.Rows.Count - 1; rowj++)
+                {
+                    CountItem = CountItem + 1;
+                    var RData = PData.Rows[rowj];
+                    if (Vrowcount == 0)
+                    {
+                        Filewrite.WriteLine(Strings.Space(0) + Strings.Space((48 - GlobalVariable.gCompanyName.Length) / 2) + BoldOn + GlobalVariable.gCompanyName + BoldOff);
+                        Filewrite.WriteLine(Strings.Space(0) + Strings.Space((48 - Add1.Length) / 2) + Add1);
+                        Filewrite.WriteLine(Strings.Space(0) + Strings.Space((48 - SecLine.Length) / 2) + SecLine);
+                        string NCFlag = Convert.ToString(GCon.getValue("SELECT ISNULL(NCFlag,'N') FROM KOT_HDR WHERE Kotdetails IN (SELECT DISTINCT Kotdetails FROM kot_det WHERE BILLDETAILS = '" + Bno + "' And FinYear = '" + FinYear1 + "') And FinYear = '" + FinYear1 + "'"));
+                        if (Type == "D")
+                        {
+                            Filewrite.WriteLine(Strings.Space(0) + Strings.Space((48 - "RE-PRINT TAX INVOICE".Length) / 2) + "RE-PRINT TAX INVOICE");
+                        }
+                        else
+                        {
+                            Filewrite.WriteLine(Strings.Space(0) + Strings.Space((48 - "TAX INVOICE".Length) / 2) + "TAX INVOICE");
+                        }
+                        Filewrite.WriteLine(Strings.Space(0) + "BILL NO :" + RData["BillDetails"] + Strings.Space(4) + Strings.Mid(Strings.Trim(Strings.Format(RData["BillTime"], "T")), 1, 10));
+                        Filewrite.WriteLine(Strings.Space(0) + "SERVER  :" + RData["STWCODE"] + "(" + RData["STWNAME"] + ")");
+                        Filewrite.WriteLine(Strings.Space(0) + "DATE    :" + Strings.Mid(Strings.Format(RData["Billdate"], "dd-MMM-yyyy"), 1, 20));
+                        Filewrite.WriteLine(Strings.Space(0) + "Club's GSTIN : " + GSTIN + Strings.Space(2) + "State Code : 19");
+                        Filewrite.WriteLine(Strings.Space(0) + Strings.StrDup(48, "-"));
+                        Filewrite.WriteLine(Strings.Space(0) + "Member Details");
+                        Filewrite.WriteLine(Strings.Space(0) + "--------------");
+                        Filewrite.WriteLine(Strings.Space(0) + "Name : " + MNm );
+                        Filewrite.WriteLine(Strings.Space(0) + "Address : " + MAdd);
+                        Filewrite.WriteLine(Strings.Space(0) + "GSTIN No : " + MGst);
+                        Filewrite.WriteLine(Strings.Space(0) + "State Code : " + MStcode);
+                        Filewrite.WriteLine(Strings.Space(0) + Strings.StrDup(48, "-"));
+                        //Filewrite.WriteLine(Strings.Space(4) + "LOC :" + RData["LOCNAME"] + "/" + RData["TABLENO"] + " PAX:" + RData["Covers"]);
+                        Filewrite.WriteLine("{0,-4}{1,-15}{2,-4}{3,-7}{4,6}{5,8}", "SNo", "HSN/SAC /DESC", "QTY", "UOM", "RATE", "AMOUNT");
+                        Filewrite.WriteLine(Strings.Space(0) + Strings.StrDup(48, "-"));
+                        //Filewrite.WriteLine();
+                        //Filewrite.WriteLine("{0,-4}{1,5}{2,-2}{3,-18}{4,8}{5,8}", "", "HSN", "", "", "", "");
+                        Vrowcount = 16;
+                        Prepaidby = RData["Adduserid"].ToString();
+                        BillPaymentMode = RData["PayMentmode"].ToString();
+                        CardCode = RData["CARDHOLDERCODE"].ToString();
+                        CardName = RData["CARDHOLDERNAME"].ToString();
+                        KRemarks = RData["KOTDETAILS"].ToString();
+                        MtNo = DateTime.Parse(RData["Billdate"].ToString()).Month;
+                        BDatePrint = DateTime.Parse(RData["Billdate"].ToString());
+                        MemberPrint = RData["MCode"].ToString();
+                    }
+                    //if (ItemHSN != RData["HSNNO"].ToString())
+                    //{
+                    //    ////Filewrite.WriteLine("{0,-4}{1,5}{2,-2}{3,-18}{4,8}{5,8}", "", Strings.Mid(RData["HSNNO"].ToString(),1,5), "", "", "", "");
+                    //    Filewrite.WriteLine("{0,-4}{1,7}{2,-1}{3,-17}{4,8}{5,8}", "", Strings.Mid(RData["HSNNO"].ToString(), 1, 7), "", "", "", "");
+                    //    Vrowcount = Vrowcount + 1;
+                    //    ItemHSN = RData["HSNNO"].ToString();
+                    //}
+                    
+                    Filewrite.WriteLine("{0,-4}{1,-15}{2,-4}{3,-7}{4,6}{5,8}", CountItem, Strings.Mid(RData["HSNNO"].ToString(), 1, 15), Strings.Format(RData["QTY"], "0"), Strings.Mid(RData["UOM"].ToString(), 1, 7), Strings.Format(RData["RATE"], "0.00"), Strings.Format(RData["AMOUNT"], "0.00"));
+                    Vrowcount = Vrowcount + 1;
+                    Filewrite.WriteLine("{0,-45}", Strings.Mid(RData["ITEMDESC"].ToString(), 1, 45));
+                    Vrowcount = Vrowcount + 1;
+
+                    DisPercent = Convert.ToDouble(RData["ItemDiscPerc"]);
+                    Total = Total + Convert.ToDouble(RData["AMOUNT"]);
+                    DiscAmount = DiscAmount + ((Convert.ToDouble(RData["AMOUNT"]) * DisPercent) / 100);
+                    //ItemHSN = Convert.ToString(GCon.getValue("select isnull(HSNNO,'') from itemmaster Where Itemcode = '" + RData["ITEMCODE"].ToString() + "'"));
+                    ////if (DisPercent > 0)
+                    ////{
+                    ////    Filewrite.WriteLine("{0,-4}{1,7}{2,-26}", "", "", "DISC " + DisPercent.ToString() + "%  " + Strings.Format(((Convert.ToDouble(RData["AMOUNT"]) * DisPercent) / 100), "0.00"));
+                    ////    Vrowcount = Vrowcount + 1;
+                    ////}
+
+                    //OthTotal = OthTotal + Convert.ToDouble(RData["OthAmount"]);
+                    //MFTotal = MFTotal + Convert.ToDouble(RData["MFAmount"]);
+                    OthTotal = OthTotal + (Convert.ToDouble(RData["OthAmount"]) - ((Convert.ToDouble(RData["OthAmount"]) * DisPercent) / 100));
+                    MFTotal = MFTotal + (Convert.ToDouble(RData["MFAmount"]) - ((Convert.ToDouble(RData["MFAmount"]) * DisPercent) / 100));
+                }
+                Filewrite.WriteLine();
+                if (BillPaymentMode == "SCARD")
+                {
+                    Filewrite.WriteLine(Strings.Space(0) + "SMART CARD:" + CardName + "[" + CardCode + "]");
+                }
+                else if (BillPaymentMode == "INR")
+                {
+                    Filewrite.WriteLine(Strings.Space(0) + "CASH:" + PData.Rows[0].ItemArray[24].ToString() + "[" + PData.Rows[0].ItemArray[23].ToString() + "]");
+                }
+                else if (BillPaymentMode == "CBILL")
+                {
+                    Filewrite.WriteLine(Strings.Space(0) + "CREDIT:" + PData.Rows[0].ItemArray[24].ToString() + "[" + PData.Rows[0].ItemArray[23].ToString() + "]");
+                }
+                else
+                {
+                    Filewrite.WriteLine(Strings.Space(0) + BillPaymentMode + ":" + PData.Rows[0].ItemArray[24].ToString() + "[" + PData.Rows[0].ItemArray[23].ToString() + "]");
+                }
+                Filewrite.WriteLine(Strings.Space(0) + Strings.StrDup(48, "-"));
+                Filewrite.WriteLine("{0,-4}{1,33}{2,8}", "", "", Strings.Format(Total, "0.00"));
+
+                if (DiscAmount > 0)
+                {
+                    //Filewrite.WriteLine("{0,-4}{1,25}{2,8}", "", "DISC AMT @ " + DisPercent + "%:", Strings.Format((Total * DisPercent) / 100, "0.00"));
+                    //Total = Total - ((Total * DisPercent) / 100);
+                    Filewrite.WriteLine("{0,-4}{1,33}{2,8}", "", "DISC AMT:", Strings.Format(DiscAmount, "0.00"));
+                    Total = Total - DiscAmount;
+                }
+                if (MFTotal > 0)
+                {
+                    Filewrite.WriteLine("{0,-4}{1,33}{2,8}", "", "Modifier CHG:", Strings.Format(MFTotal, "0.00"));
+                    //MFTotal = MFTotal - ((MFTotal * DisPercent) / 100);
+                }
+                if (OthTotal > 0)
+                {
+                    Filewrite.WriteLine("{0,-4}{1,33}{2,8}", "", "OTH CHG:", Strings.Format(OthTotal, "0.00"));
+                    //OthTotal = OthTotal - ((OthTotal * DisPercent) / 100);
+                }
+
+                sql = "SELECT A.taxdesc,SUM(T.TAXAMT) - (sum(((T.TAXAMT * Isnull(ItemDiscPerc,0)) /100 ))) AS TAMOUNT FROM KOT_DET_TAX T,KOT_DET D,accountstaxmaster A WHERE ISNULL(T.KOTDETAILS,'') = ISNULL(D.KOTDETAILS,'') AND ISNULL(T.ITEMCODE,'') = ISNULL(D.ITEMCODE,'') AND ISNULL(T.SLNO,0) = ISNULL(D.SLNO,0) AND ISNULL(T.FinYear,'') = ISNULL(D.FinYear,'') ";
+                sql = sql + " AND ISNULL(T.TAXCODE,'') = ISNULL(A.taxcode,0) AND D.BILLDETAILS = '" + Bno + "' AND ISNULL(D.FinYear,'') = '" + FinYear1 + "' AND ISNULL(D.KOTSTATUS,'') <> 'Y' AND ISNULL(T.TAXAMT,0) > 0 GROUP BY A.taxdesc ";
+                TData = GCon.getDataSet(sql);
+                if (TData.Rows.Count > 0)
+                {
+                    for (int i = 0; i <= TData.Rows.Count - 1; i++)
+                    {
+                        var RData = TData.Rows[i];
+                        Filewrite.WriteLine("{0,-4}{1,33}{2,8}", "", RData["taxdesc"] + ":", Strings.Format(RData["TAMOUNT"], "0.00"));
+                        TaxTotal = TaxTotal + Convert.ToDouble(RData["TAMOUNT"]);
+                    }
+                }
+                Filewrite.WriteLine(Strings.Space(0) + Strings.StrDup(48, "-"));
+                Filewrite.WriteLine("{0,-33}{1,4}{2,8}", "Total :", "", Strings.Format(Total + TaxTotal + OthTotal + MFTotal, "0.00"));
+                Double Rnd = Math.Round(Total + TaxTotal + OthTotal + MFTotal) - (Total + TaxTotal + OthTotal + MFTotal);
+                Filewrite.WriteLine("{0,-33}{1,4}{2,8}", "Round off:", "", Strings.Format(Rnd, "0.00"));
+                BillTotal = Total + TaxTotal + OthTotal + MFTotal + Rnd;
+                Filewrite.WriteLine(Strings.Space(0) + Strings.StrDup(48, "-"));
+                Filewrite.WriteLine("{0,-33}{1,4}{2,8}", "", "", Strings.Format(BillTotal, "0.00"));
+                Filewrite.WriteLine(Strings.Space(0) + Strings.StrDup(48, "-"));
+
+                ////sql = " SELECT PAYMENTMODE,PAYAMOUNT FROM BILLSETTLEMENT WHERE BILLNO = '" + Bno + "' AND ISNULL(FinYear,'') = '" + FinYear1 + "' ORDER BY AUTOID ";
+                ////SData = GCon.getDataSet(sql);
+                ////if (SData.Rows.Count > 0)
+                ////{
+                ////    for (int i = 0; i <= SData.Rows.Count - 1; i++)
+                ////    {
+                ////        var RData = SData.Rows[i];
+                ////        Filewrite.WriteLine("{0,-4}{1,33}{2,8}", "", RData["PAYMENTMODE"] + ":", Strings.Format(RData["PAYAMOUNT"], "0.00"));
+                ////    }
+                ////}
+
+                //ExtraTips = Convert.ToDouble(GCon.getValue(" Select Isnull(ExtraTips,0) from BILL_HDR WHERE BillDetails = '" + Bno + "' AND ISNULL(FinYear,'') = '" + FinYear1 + "' "));
+                //RefundAmt = Convert.ToDouble(GCon.getValue(" Select Isnull(RefundAmt,0) from BILL_HDR WHERE BillDetails = '" + Bno + "' AND ISNULL(FinYear,'') = '" + FinYear1 + "' "));
+                //if (ExtraTips > 0)
+                //{
+                //    Filewrite.WriteLine("{0,-4}{1,33}{2,8}", "", "TIPS:", Strings.Format(ExtraTips, "0.00"));
+                //}
+                //if (RefundAmt > 0)
+                //{
+                //    Filewrite.WriteLine("{0,-4}{1,33}{2,8}", "", "REFUND:", Strings.Format(RefundAmt, "0.00"));
+                //}
+                Filewrite.WriteLine(Strings.Space(0) + "Prepared By :" + Prepaidby);
+
+                Filewrite.WriteLine(Strings.Space(0) + Strings.StrDup(48, "-"));
+                DataTable CData = new DataTable();
+                DataTable MData = new DataTable();
+                DataTable ARMData = new DataTable();
+                DataTable RoomData = new DataTable();
+            
+                DataTable Remark = new DataTable();
+                ////sql = "SELECT ISNULL(REMARKS,'') AS REMARKS,ISNULL(NCRemarks,'') AS NCRemarks  FROM BILL_HDR WHERE BillDetails = '" + Bno + "' AND ISNULL(FinYear,'') = '" + FinYear1 + "' ";
+                ////Remark = GCon.getDataSet(sql);
+                ////if (Remark.Rows.Count > 0)
+                ////{
+                ////    var ReData = Remark.Rows[0];
+                ////    if (ReData["REMARKS"] != "")
+                ////    {
+                ////        Filewrite.WriteLine("{0,-4}{1,-41}", "", "Remarks : " + ReData["REMARKS"]);
+                ////    }
+                ////    if (ReData["NCRemarks"] != "")
+                ////    {
+                ////        Filewrite.WriteLine("{0,-4}{1,-41}", "", "NC Remarks : " + ReData["NCRemarks"]);
+                ////    }
+                ////}
+                Filewrite.WriteLine("{0,-41}", "Remarks :  Ref. KOT NO.(s) -" + KRemarks);
+
+                String Paymode1 = Convert.ToString(GCon.getValue(" SELECT TOP 1 PAYMENTMODE FROM BILLSETTLEMENT WHERE BILLNO = '" + Bno + "' AND ISNULL(FinYear,'') = '" + FinYear1 + "'"));
+                if (Paymode1 == "SCARD")
+                {
+                    Double ClsAmount = 0, OpAmount = 0, TrnAmount = 0;
+
+                    sql = "select Top 1 ISNULL(BALANCE,0) AS BALANCE from SM_CARDFILE_HDR where CARDCODE in (select CARDCODE from SM_POSTRANSACTION WHERE BILL_NO = '" + Bno + "')";
+                    if (OutData.Rows.Count > 0)
+                    {
+                        ClsAmount = Convert.ToDouble(OutData.Rows[0].ItemArray[0]);
+                    }
+                    TrnAmount = Math.Round(Total + TaxTotal + OthTotal + MFTotal);
+                    OpAmount = ClsAmount + TrnAmount;
+                    Filewrite.WriteLine("{0,-15}{1,-15}{2,11}", "CARD OP BAL", "TRN AMOUNT", "CLBAL");
+                    Filewrite.WriteLine(Strings.Space(0) + Strings.StrDup(48, "-"));
+                    Filewrite.WriteLine("{0,-15}{1,-15}{2,11}", Strings.Format(OpAmount, "0.00"), Strings.Format(TrnAmount, "0.00"), Strings.Format(ClsAmount, "0.00"));
+                    Filewrite.WriteLine(Strings.Space(0) + Strings.StrDup(48, "-"));
+                }
+                DataTable OutQtr = new DataTable();
+                if (MtNo == 4 || MtNo == 5 || MtNo == 6) 
+                {
+                    sql = "SELECT Isnull(Sum(Round(ISNULL(TotalAmount,0),0)),0) AS AMT FROM Bill_Hdr WHERE MCODE = '" + MemberPrint + "' AND MONTH(BillDate) IN (4,5,6) And Year(BillDate) = " + BDatePrint.Year + " AND PAYMENTMODE IN ('CREDIT','SMART CARD','CASH','INR','SCARD','CBILL') AND ISNULL(DELFLAG,'') <> 'Y' ";
+                }
+                else if (MtNo == 7 || MtNo == 8 || MtNo == 9) 
+                {
+                    sql = "SELECT Isnull(Sum(Round(ISNULL(TotalAmount,0),0)),0) AS AMT FROM Bill_Hdr WHERE MCODE = '" + MemberPrint + "' AND MONTH(BillDate) IN (7,8,9) And Year(BillDate) = " + BDatePrint.Year + " AND PAYMENTMODE IN ('CREDIT','SMART CARD','CASH','INR','SCARD','CBILL') AND ISNULL(DELFLAG,'') <> 'Y' ";
+                }
+                else if (MtNo == 10 || MtNo == 11 || MtNo == 12)
+                {
+                    sql = "SELECT Isnull(Sum(Round(ISNULL(TotalAmount,0),0)),0) AS AMT FROM Bill_Hdr WHERE MCODE = '" + MemberPrint + "' AND MONTH(BillDate) IN (10,11,12) And Year(BillDate) = " + BDatePrint.Year + " AND PAYMENTMODE IN ('CREDIT','SMART CARD','CASH','INR','SCARD','CBILL') AND ISNULL(DELFLAG,'') <> 'Y' ";
+                }
+                else if (MtNo == 1 || MtNo == 2 || MtNo == 3)
+                {
+                    sql = "SELECT Isnull(Sum(Round(ISNULL(TotalAmount,0),0)),0) AS AMT FROM Bill_Hdr WHERE MCODE = '" + MemberPrint + "' AND MONTH(BillDate) IN (1,2,3) And Year(BillDate) = " + BDatePrint.Year + " AND PAYMENTMODE IN ('CREDIT','SMART CARD','CASH','INR','SCARD','CBILL') AND ISNULL(DELFLAG,'') <> 'Y' ";
+                }
+                OutQtr = GCon.getDataSet(sql);
+                if (OutQtr.Rows.Count > 0)
+                {
+                    var ReData1 = OutQtr.Rows[0];
+                    Filewrite.WriteLine("Used Amount in this Qtr: " + Strings.Format(ReData1["AMT"], "0.00"));
+                }
+                Filewrite.WriteLine();
+                Filewrite.WriteLine(Strings.Space(0) + Strings.Space((48 - "Bill Payable on Presentation".Length) / 2) + "Bill Payable on Presentation");
+                Filewrite.WriteLine(Strings.Space(0) + Strings.Space((48 - "NO TIPPING".Length) / 2) + "NO TIPPING");
+                Filewrite.WriteLine(Strings.Space(0) + Strings.Space((48 - "CSC".Length) / 2) + "CSC");
+
+                for (int i = 1; i <= 4; i++)
+                {
+                    Filewrite.WriteLine("");
+                }
+
+                if (gPrint == true)
+                {
+                    char GS = Strings.Chr(29);
+                    char ESC = Strings.Chr(27);
+                    String CMD;
+                    CMD = ESC + "i";
+                    Filewrite.WriteLine(CMD);
+                }
+                Filewrite.Close();
+                if (gPrint == false)
+                {
+                    GCon.OpenTextFile(vOutfile);
+                }
+                else
+                {
+                    GCon.PrintTextFile1(vFilepath, GlobalVariable.PrinterName);
+                }
+            }
+        }
+
         //static void TestImage(ThermalPrinter printer) 
         //{ }
 
