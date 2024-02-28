@@ -352,7 +352,8 @@ namespace TouchPOS
             PosItemUom = Convert.ToString(DG.Rows[Row].Cells[6].Value);
             VarPosCode = Convert.ToString(DG.Rows[Row].Cells[5].Value);
 
-            BControl = Convert.ToString(getValue("select distinct ISNULL(StkCtl,'NO') as BControl from ITEMMASTER WHERE ItemCode = '" + ItemCode + "'"));
+            //BControl = Convert.ToString(getValue("select distinct ISNULL(StkCtl,'NO') as BControl from ITEMMASTER WHERE ItemCode = '" + ItemCode + "'"));
+            BControl = Convert.ToString(getValue("select Isnull(StockCtrl,'NO') As BControl from POSMASTER WHERE poscode = '" + VarPosCode + "'"));
 
             if (GlobalVariable.gCompName == "KGA")
             { }
@@ -388,7 +389,7 @@ namespace TouchPOS
             DataTable BOMDet = new DataTable();
             DataTable Closing = new DataTable();
 
-            Sql = "SELECT GITEMCODE,GUOM,GQTY,ISNULL(CTYN,'N') AS CTYN FROM BOM_DET WHERE ITEMCODE='" + PosItemCode + "' AND ITEMUOM='" + PosItemUom + "' AND ISNULL(VOID,'') <> 'Y'";
+            Sql = "SELECT GITEMCODE,GUOM,GQTY,ISNULL(Cocktail,'N') AS CTYN FROM BOM_DET WHERE ITEMCODE='" + PosItemCode + "' AND ITEMUOM='" + PosItemUom + "' AND ISNULL(VOID,'') <> 'Y'";
             BOMDet = getDataSet(Sql);
             if (BOMDet.Rows.Count > 0)
             {
@@ -405,6 +406,10 @@ namespace TouchPOS
                     {
                         CLSQTY1 = ClosingQuantity_KGA(Convert.ToString(dr["GITEMCODE"]), SUBSTORECODE, Convert.ToString(dr["GUOM"]));
                     }
+                    if (GlobalVariable.gCompName == "CSC")
+                    {
+                        CLSQTY1 = ClosingQuantity_CSC(Convert.ToString(dr["GITEMCODE"]), SUBSTORECODE, Convert.ToString(dr["GUOM"]));
+                    }
                     if ((CLSQTY1 / Convert.ToDouble(dr["GQTY"])) < DBLCALQTY)
                     {
                         MessageBox.Show(PosItemCode + " NOT AVAILABLE, BALANCE IS " + CLSQTY1);
@@ -415,6 +420,86 @@ namespace TouchPOS
             return 2;
         }
 
+        public double ClosingQuantity_CSC(string Itemcode, string Storecode, string STUom) 
+        {
+            Double AdjustQty = 0, ClsQty = 0, MainstockQty = 0, TransQty = 0, TransFromQty = 0, TransToQty = 0;
+            Double OpQty = 0, GrnQty = 0, IssueQty = 0, IssueToQty = 0, IssueFromQty = 0, ConsumedQty = 0;
+            DataTable OpStock = new DataTable();
+            DataTable IssueFrom = new DataTable();
+            DataTable IssueTo = new DataTable();
+            DataTable Adjust = new DataTable();
+            DataTable TransFrom = new DataTable();
+            DataTable TransTo = new DataTable();
+            DataTable Consum = new DataTable();
+            string Sql = "";
+
+            Sql = "SELECT ISNULL(OPSTOCK,0) * ISNULL(CONVVALUE,0) AS OPSTOCK1,ISNULL(OPSTOCK,0) AS OPSTOCK FROM INVENTORYITEMMASTER WHERE ITEMCODE='" + Itemcode + "' AND ISNULL(FREEZE,'') <> 'Y' AND STORECODE='" + Storecode + "'";
+            OpStock = getDataSet(Sql);
+            if (OpStock.Rows.Count > 0)
+            {
+                OpQty = Convert.ToDouble(OpStock.Rows[0].ItemArray[1]);
+            }
+            else { OpQty = 0; }
+
+            MainstockQty = OpQty;
+
+            Sql = "SELECT ISNULL(SUM(DBLAMT),0) AS QTY1,ISNULL(SUM(QTY),0) AS QTY FROM STOCKISSUEDETAIL WHERE ITEMCODE='" + Itemcode + "' AND STORELOCATIONCODE = '" + Storecode + "' AND ISNULL(VOID,'')<>'Y'";
+            IssueFrom = getDataSet(Sql);
+            if (IssueFrom.Rows.Count > 0)
+            {
+                IssueFromQty = Convert.ToDouble(IssueFrom.Rows[0].ItemArray[1]);
+            }
+            else { IssueFromQty = 0; }
+
+            Sql = "SELECT ISNULL(SUM(DBLAMT),0) AS QTY1,ISNULL(SUM(QTY),0) AS QTY FROM STOCKISSUEDETAIL WHERE ITEMCODE='" + Itemcode + "' AND OPSTORELOCATIONCODE = '" + Storecode + "' AND ISNULL(VOID,'')<>'Y'";
+            IssueTo = getDataSet(Sql);
+            if (IssueTo.Rows.Count > 0)
+            {
+                IssueToQty = Convert.ToDouble(IssueTo.Rows[0].ItemArray[1]);
+            }
+            else { IssueToQty = 0; }
+
+            IssueQty = IssueToQty - IssueFromQty;
+
+            Sql = "SELECT ISNULL(SUM(DBLAMOUNT),0) AS QTY1,ISNULL(SUM(ADJUSTEDSTOCK),0) AS QTY FROM STOCKADJUSTDETAILS WHERE ITEMCODE='" + Itemcode + "' AND STORELOCATIONCODE = '" + Storecode + "' AND ISNULL(VOID,'')<>'Y' ";
+            Adjust = getDataSet(Sql);
+            if (Adjust.Rows.Count > 0)
+            {
+                AdjustQty = Convert.ToDouble(Adjust.Rows[0].ItemArray[1]);
+            }
+            else { AdjustQty = 0; }
+
+            Sql = "SELECT ISNULL(SUM(DBLAMT),0) AS QTY1,ISNULL(SUM(QTY),0) AS QTY FROM STOCKTRANSFERDETAIL WHERE ITEMCODE='" + Itemcode + "' AND FROMSTORECODE = '" + Storecode + "'  AND ISNULL(VOID,'')<>'Y' ";
+            TransFrom = getDataSet(Sql);
+            if (TransFrom.Rows.Count > 0)
+            {
+                TransFromQty = Convert.ToDouble(TransFrom.Rows[0].ItemArray[1]);
+            }
+            else { TransFromQty = 0; }
+
+            Sql = "SELECT ISNULL(SUM(DBLAMT),0) AS QTY1,ISNULL(SUM(QTY),0) AS QTY FROM STOCKTRANSFERDETAIL WHERE ITEMCODE='" + Itemcode + "' AND TOSTORECODE = '" + Storecode + "'  AND ISNULL(VOID,'')<>'Y' ";
+            TransTo = getDataSet(Sql);
+            if (TransTo.Rows.Count > 0)
+            {
+                TransToQty = Convert.ToDouble(TransTo.Rows[0].ItemArray[1]);
+            }
+            else { TransToQty = 0; }
+
+            TransQty = TransToQty - TransFromQty;
+
+            Sql = "SELECT ISNULL(SUM(DBLAMT),0) AS QTY1,ISNULL(SUM(QTY),0) AS QTY FROM SUBSTORECONSUMPTIONDETAIL WHERE ITEMCODE='" + Itemcode + "' AND STORELOCATIONCODE = '" + Storecode + "'  AND ISNULL(VOID,'')<>'Y' ";
+            Consum = getDataSet(Sql);
+            if (Consum.Rows.Count > 0)
+            {
+                ConsumedQty = Convert.ToDouble(Consum.Rows[0].ItemArray[1]);
+            }
+            else { ConsumedQty = 0; }
+
+            ClsQty = (MainstockQty + AdjustQty) + IssueQty + TransQty - ConsumedQty;
+
+            return ClsQty;
+
+        }
         public double ClosingQuantity_KGA(string Itemcode, string Storecode, string STUom) 
         {
             Double ClsQty = 0;
